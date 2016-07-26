@@ -29,7 +29,7 @@ Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS, LIS3DH_MOSI, LIS3DH_MISO, LIS3D
   #include <avr/power.h>
 #endif
 
-#define LED_PIN 6
+#define LED_PIN 4
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -43,23 +43,23 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup(void) {
   // accelerometer setup code
-#ifndef ESP8266
+/*#ifndef ESP8266
   while (!Serial);     // will pause Zero, Leonardo, etc until serial console opens
 #endif
 
   Serial.begin(9600);
   Serial.println("LIS3DH test!");
-  
+*/  
   if (! lis.begin(0x18)) {   // change this to 0x19 for alternative i2c address
-    Serial.println("Couldnt start");
+    // Serial.println("Couldnt start");
     while (1);
   }
-  Serial.println("LIS3DH found!");
+  //Serial.println("LIS3DH found!");
   
   lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
   
-  Serial.print("Range = "); Serial.print(2 << lis.getRange());  
-  Serial.println("G");
+  //Serial.print("Range = "); Serial.print(2 << lis.getRange());  
+  //Serial.println("G");
 
   // neopixel setup code
   strip.begin();
