@@ -1,22 +1,13 @@
-// Accelerometer libraries
-#include <Wire.h>
-#include <SPI.h>
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 
 // Used for software SPI for accelerometer, Adafruit LIS3DH
 #define LIS3DH_CLK 2
-#define LIS3DH_MISO 1
-#define LIS3DH_MOSI 0
-// Used for hardware & software SPI
+#define LIS3DH_MISO 0
+#define LIS3DH_MOSI 1
 #define LIS3DH_CS 3
 
-// software SPI
 Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS, LIS3DH_MOSI, LIS3DH_MISO, LIS3DH_CLK);
-// hardware SPI
-//Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS);
-// I2C
-//Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 
 #if defined(ARDUINO_ARCH_SAMD)
 // for Zero, output on USB Serial console, remove line below if using programming port to program the Zero!
@@ -39,37 +30,36 @@ Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS, LIS3DH_MOSI, LIS3DH_MISO, LIS3D
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+//Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, LED_PIN, NEO_RGB + NEO_KHZ800);
 
 void setup(void) {
-  // accelerometer setup code
-/*#ifndef ESP8266
-  while (!Serial);     // will pause Zero, Leonardo, etc until serial console opens
-#endif
-
-  Serial.begin(9600);
-  Serial.println("LIS3DH test!");
-*/  
-  if (! lis.begin(0x18)) {   // change this to 0x19 for alternative i2c address
-    // Serial.println("Couldnt start");
-    while (1);
-  }
-  //Serial.println("LIS3DH found!");
-  
-  lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
-  
-  //Serial.print("Range = "); Serial.print(2 << lis.getRange());  
-  //Serial.println("G");
-
-  // neopixel setup code
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  
+  if (! lis.begin(0x18)) {   // change this to 0x19 for alternative i2c address
+    blinkTwoColors(strip.Color(255,0,0), strip.Color(0,0,0), 300, 5);
+    while (1);
+  }
+  lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
+  blinkTwoColors(strip.Color(0,255,0), strip.Color(0,0,0), 300, 5);
 }
 
+void blinkTwoColors (uint32_t first, uint32_t second, int duration, int times) {
+  for (int i = 0; i < times; i++) {
+    strip.setPixelColor(0,first);
+    strip.show();
+    delay(duration);
+    strip.setPixelColor(0, second);
+    strip.show();
+    delay(duration);
+  }
+}
 
 float gravity = 9.3; // m/s^2, not quite 
 double magnitude = 0;
-double threshhold = 25; // lower value means easier to lose
+double threshhold = 2; // lower value means easier to lose
 bool hasLost = false;
 uint32_t color;
 uint32_t blinkColor = strip.Color(255,255,255);
